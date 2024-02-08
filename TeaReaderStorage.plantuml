@@ -1,0 +1,79 @@
+@startuml
+
+!theme plain
+top to bottom direction
+
+package storage {
+    interface TeaStorage << interface >>
+    interface TeaCreatorStorage << interface >>
+    interface TeaReaderStorage << interface >>
+
+    class TeaStorageFactory
+
+
+    package json {
+        class AbstractTeaJsonStorage
+        class TeaReaderJsonStorage
+        class TeaCreatorJsonStorage
+        class TeaJsonStorage
+    }
+
+    package sqlite {
+        class AbstractTeaSqliteStorage
+        class TeaCreatorSqliteStorage
+        class TeaReaderSqliteStorage
+        class TeaSqliteStorage
+    }
+}
+
+package web {
+    class MainPage
+    class AssetHandler
+    class TeaWebServer
+    class WebServer
+}
+
+package service {
+    class TeaCreatorService
+    class TeaReaderService
+    class TeaService
+}
+
+class Main
+class Tea <<record>>
+
+
+
+
+'Main                      -[#595959,dashed]->  TeaService               : "«create»"
+'Main                      -[#595959,dashed]->  TeaStorage
+'Main                      -[#595959,dashed]->  TeaStorageFactory        : "«create»"
+'Main                      -[#595959,dashed]->  TeaWebServer             : "«create»"
+'Main                      -[#595959,dashed]->  WebServer
+MainPage                 "1" *-[#595959,plain]-> "teaService\n1" TeaService
+TeaCreatorJsonStorage     -[#000082,plain]-^  AbstractTeaJsonStorage
+TeaCreatorJsonStorage    "1" *-[#595959,plain]-> "teaReader\n1" TeaReaderJsonStorage
+TeaCreatorService        "1" *-[#595959,plain]-> "teaCreatorStorage\n1" TeaCreatorStorage
+TeaCreatorSqliteStorage   -[#000082,plain]-^  AbstractTeaSqliteStorage
+TeaJsonStorage            -[#595959,dashed]->  TeaCreatorJsonStorage    : "«create»"
+TeaJsonStorage            -[#595959,dashed]->  TeaReaderJsonStorage     : "«create»"
+TeaJsonStorage            -[#008200,dashed]-^  TeaStorage
+TeaReaderJsonStorage      -[#000082,plain]-^  AbstractTeaJsonStorage
+TeaReaderService         "1" *-[#595959,plain]-> "teaReaderStorage\n1" TeaReaderStorage
+TeaReaderSqliteStorage    -[#000082,plain]-^  AbstractTeaSqliteStorage
+TeaService                -[#595959,dashed]->  TeaCreatorService        : "«create»"
+TeaService                -[#595959,dashed]->  TeaReaderService         : "«create»"
+TeaService               "1" *-[#595959,plain]-> "teaStorage\n1" TeaStorage
+TeaSqliteStorage          -[#595959,dashed]->  TeaCreatorSqliteStorage  : "«create»"
+TeaSqliteStorage          -[#595959,dashed]->  TeaReaderSqliteStorage   : "«create»"
+TeaSqliteStorage          -[#008200,dashed]-^  TeaStorage
+TeaStorage                -[#008200,plain]-^  TeaCreatorStorage
+TeaStorage                -[#008200,plain]-^  TeaReaderStorage
+TeaStorageFactory         -[#595959,dashed]->  TeaJsonStorage           : "«create»"
+TeaStorageFactory         -[#595959,dashed]->  TeaSqliteStorage         : "«create»"
+TeaStorageFactory        "1" *-[#595959,plain]-> "teaStoragePredicates\n*" TeaStorage
+TeaWebServer              -[#595959,dashed]->  AssetHandler             : "«create»"
+TeaWebServer              -[#595959,dashed]->  MainPage                 : "«create»"
+TeaWebServer             "1" *-[#595959,plain]-> "teaService\n1" TeaService
+TeaWebServer              -[#000082,plain]-^  WebServer
+@enduml
